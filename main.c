@@ -81,17 +81,7 @@ programmer_t pgms[] = {
 		stlink2_swim_read_range,
 		stlink2_swim_write_range,
 	},
-	{
-		"espstlink",
-		ESP_STLink,
-		0,
-		0,
-		espstlink_pgm_open,
-		espstlink_pgm_close,
-		espstlink_srst,
-		espstlink_swim_read_range,
-		espstlink_swim_write_range,
-	},
+
 	{ NULL },
 };
 
@@ -593,7 +583,22 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "%d bytes at 0x%x... ", bytes_to_write, start);
 
 		/* flashing MCU */
-		int sent = pgm->write_range(pgm, part, buf, start, bytes_to_write, memtype);
+		int sent = 0;
+		int try_i = 0;
+		for (try_i=0; try_i<3; try_i++)
+		{
+			sent = pgm->write_range(pgm, part, buf, start, bytes_to_write, memtype);
+			if (sent >= 0)
+			{
+				break;
+			}
+		}
+		if (try_i == 3)
+		{
+			printf("pgm->write_range fail\n");
+			exit(1);
+		} 
+
 		if(pgm->reset) {
 			// Restarting core (if applicable)
 			pgm->reset(pgm);

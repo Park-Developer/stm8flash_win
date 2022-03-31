@@ -259,7 +259,7 @@ int stlink2_swim_write_range(programmer_t *pgm, const stm8_device_t *device, uns
             int j;
             for(j = 0; j < length; j++){
                 stlink2_write_byte(pgm, buffer[j], start+j);
-                TRY(8, HI(stlink2_get_status(pgm)) == 1);
+                TRY2(8, HI(stlink2_get_status(pgm)) == 1);
             }
         } else {
             // page-based writing
@@ -275,7 +275,7 @@ int stlink2_swim_write_range(programmer_t *pgm, const stm8_device_t *device, uns
             msg_send(pgm, &(buffer[i + 8]), BLOCK_SIZE - 8);
 
             // Waiting for the transfer to process
-            TRY(128, HI(stlink2_get_status(pgm)) == BLOCK_SIZE);
+            TRY2(8, HI(stlink2_get_status(pgm)) == BLOCK_SIZE);
         }
 
         if(memtype == FLASH || memtype == EEPROM || memtype == OPT) {
